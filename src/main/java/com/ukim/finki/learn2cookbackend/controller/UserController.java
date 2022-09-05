@@ -28,8 +28,8 @@ public class UserController {
     }
 
     @PostMapping("register")
-    public User register(@RequestBody User user) {
-        return userService.saveUser(user);
+    public User register(@RequestBody LoginRequest loginRequest) {
+        return userService.registerUser(loginRequest.getUsername(), loginRequest.getPassword());
     }
 
     @PostMapping("{username}")

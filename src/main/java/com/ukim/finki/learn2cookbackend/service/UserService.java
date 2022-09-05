@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -26,14 +27,18 @@ public class UserService {
     private UserRepository userRepository;
 
     public User findUser(String username) {
-        if (!username.equals("username")) {
+        Optional<User> user = userRepository.findById(username);
+
+        if (user.isEmpty()) {
             throw new UserNotFound();
         }
 
-        // mock data
+        return user.get();
+    }
+
+    public User getDefaultUserSettings() {
+        // default data
         User user = new User();
-        user.setUsername("username");
-        user.setPassword("test");
         user.setType(UserType.DEFAULT);
         user.setPoints(0);
         user.setKitchenItems(ingredientsService.getMockKitchenItems());
@@ -76,6 +81,13 @@ public class UserService {
 
     public User saveUser(User user) {
         return userRepository.save(user);
+    }
+
+    public User registerUser(String username, String password) {
+        User user = getDefaultUserSettings();
+        user.setUsername(username);
+        user.setPassword(password);
+        return saveUser(user);
     }
 
     private MealPeriod periodFactory(LocalTime from, LocalTime to, boolean salad, boolean desert) {
