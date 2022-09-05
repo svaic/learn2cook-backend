@@ -27,10 +27,10 @@ public class RecipesService {
     private ReceiptRepository receiptRepository;
 
     public List<Receipt> recipes() {
-        //List<Receipt> recipes = receiptRepository.findAll();
-//        if (recipes.isEmpty()) {
-//            return receiptRepository.saveAllAndFlush(new ArrayList<>(mockRecipes()));
-//        }
+        List<Receipt> recipes = receiptRepository.findAll();
+        if (recipes.isEmpty()) {
+            return receiptRepository.saveAllAndFlush(new ArrayList<>(mockRecipes()));
+        }
         return mockRecipes();
     }
 
@@ -85,14 +85,37 @@ public class RecipesService {
         step3.setPictureUrl("https://thumbs.dreamstime.com/z/turn-oven-dial-wit-hnd-hand-close-heat-meat-lunch-dinner-food-preparation-ingredient-cooking-chef-house-family-ready-gourmet-139076178.jpg");
         step3.setDuration(Duration.ZERO);
 
-        List<Step> steps = new ArrayList<>(List.of(step1, step2, step3));
+        List<Step> stepsForReceipt1 = new ArrayList<>(List.of(step1, step2, step3));
 
-        receipt1.setSteps(steps);
-        receipt1.setIngredients(ingredientsService.sumOfIngredientsWithSize(steps));
+        receipt1.setSteps(stepsForReceipt1);
+        receipt1.setIngredients(ingredientsService.sumOfIngredientsWithSize(stepsForReceipt1));
         receipt1.setTimeToPrepare(Duration.ofMinutes(30));
 
-        receipt2.setSteps(steps);
-        receipt2.setIngredients(ingredientsService.sumOfIngredientsWithSize(steps));
+        Step step1ForReceipt2 = new Step();
+        step1ForReceipt2.setStepNumber(1);
+        step1ForReceipt2.setIngredientsUsed(new ArrayList<>(List.of(macaroniWithSize)));
+        step1ForReceipt2.setDescription("Stavi voda vo ringla");
+        step1ForReceipt2.setPictureUrl("https://www.thoughtco.com/thmb/r213S4ELSf1XozTXmITBspeLz6Y=/1333x1000/smart/filters:no_upscale()/BoilingWater-58e3d1ac5f9b58ef7e060f93.jpg");
+        step1ForReceipt2.setDuration(Duration.ofMinutes(15));
+
+        Step step2ForReceipt2 = new Step();
+        step2ForReceipt2.setStepNumber(2);
+        step2ForReceipt2.setIngredientsUsed(new ArrayList<>(List.of(saltWithSize)));
+        step2ForReceipt2.setDescription("Stavi sol vo tafceto");
+        step2ForReceipt2.setPictureUrl("https://media.gettyimages.com/photos/salt-being-sprinkled-into-pot-of-water-picture-id162758559?s=2048x2048");
+        step2ForReceipt2.setDuration(Duration.ofSeconds(5));
+
+        Step step3ForReceipt2 = new Step();
+        step3ForReceipt2.setStepNumber(3);
+        step3ForReceipt2.setIngredientsUsed(new ArrayList<>());
+        step3ForReceipt2.setDescription("Iskluci ja ringlata");
+        step3ForReceipt2.setPictureUrl("https://thumbs.dreamstime.com/z/turn-oven-dial-wit-hnd-hand-close-heat-meat-lunch-dinner-food-preparation-ingredient-cooking-chef-house-family-ready-gourmet-139076178.jpg");
+        step3ForReceipt2.setDuration(Duration.ZERO);
+
+        List<Step> stepsForReceipt2 = new ArrayList<>(List.of(step1ForReceipt2, step2ForReceipt2, step3ForReceipt2));
+
+        receipt2.setSteps(stepsForReceipt2);
+        receipt2.setIngredients(ingredientsService.sumOfIngredientsWithSize(stepsForReceipt2));
         receipt2.setTimeToPrepare(Duration.ofMinutes(30));
 
         List<Receipt> mockReceipts = Stream.concat(
