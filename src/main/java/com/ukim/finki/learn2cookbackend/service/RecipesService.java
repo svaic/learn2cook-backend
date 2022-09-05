@@ -27,11 +27,11 @@ public class RecipesService {
     private ReceiptRepository receiptRepository;
 
     public List<Receipt> recipes() {
-        List<Receipt> recipes = receiptRepository.findAll();
-        if (recipes.isEmpty()) {
-            return receiptRepository.saveAllAndFlush(new ArrayList<>(mockRecipes()));
-        }
-        return recipes;
+        //List<Receipt> recipes = receiptRepository.findAll();
+//        if (recipes.isEmpty()) {
+//            return receiptRepository.saveAllAndFlush(new ArrayList<>(mockRecipes()));
+//        }
+        return mockRecipes();
     }
 
     public List<Receipt> mockRecipes() {
