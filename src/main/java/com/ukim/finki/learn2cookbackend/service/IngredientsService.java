@@ -84,7 +84,7 @@ public class IngredientsService {
 
         return distinctIngredients.values().stream()
                 .filter(Optional::isPresent)
-                .map(Optional::get).toList();
+                .map(Optional::get).collect(Collectors.toList());
     }
 
     public IngredientWithSize wrapIngredientWithSize(Ingredient ingredient, int count, IngredientSizeType type) {
