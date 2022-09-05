@@ -38,6 +38,7 @@ public class Receipt {
     List<IngredientWithSize> kitchenEquipment;
     @OneToMany(cascade=CascadeType.ALL)
     List<Step> steps;
+    String pictureUrl;
     Duration timeToPrepare;
     @Enumerated(EnumType.STRING)
     ReceiptDifficulty difficulty;

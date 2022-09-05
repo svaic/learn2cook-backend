@@ -13,7 +13,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class RecipesService {
@@ -30,6 +33,15 @@ public class RecipesService {
         receipt1.setType(ReceiptType.DINNER);
         receipt1.setCalories(2000);
         receipt1.setDifficulty(ReceiptDifficulty.EASY);
+        receipt1.setPictureUrl("https://www.ruchiskitchen.com/wp-content/uploads/2022/03/Indian-style-Vegetable-Macaroni-3-500x500.jpg");
+
+        Receipt receipt2 = new Receipt();
+        receipt2.setName("Pizza");
+        receipt2.setCategory(FoodCategory.MAIN);
+        receipt2.setType(ReceiptType.DINNER);
+        receipt2.setCalories(2400);
+        receipt2.setDifficulty(ReceiptDifficulty.HARD);
+        receipt2.setPictureUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg/800px-Eq_it-na_pizza-margherita_sep2005_sml.jpg");
 
         IngredientWithSize macaroniWithSize = new IngredientWithSize();
         macaroniWithSize.setIngredient(ingredientsService.getIngredient("Raw macaroni"));
@@ -42,6 +54,7 @@ public class RecipesService {
         saltWithSize.setSizeType(IngredientSizeType.G);
 
         receipt1.setKitchenEquipment(ingredientsService.getMockKitchenItems());
+        receipt2.setKitchenEquipment(ingredientsService.getMockKitchenItems());
 
         Step step1 = new Step();
         step1.setStepNumber(1);
@@ -70,7 +83,17 @@ public class RecipesService {
         receipt1.setIngredients(ingredientsService.sumOfIngredientsWithSize(steps));
         receipt1.setTimeToPrepare(Duration.ofMinutes(30));
 
-        return List.of(receipt1);
+        receipt2.setSteps(steps);
+        receipt2.setIngredients(ingredientsService.sumOfIngredientsWithSize(steps));
+        receipt2.setTimeToPrepare(Duration.ofMinutes(30));
+
+        List<Receipt> mockReceipts = Stream.concat(
+                Collections.nCopies(5, receipt1).stream(),
+                Collections.nCopies(5, receipt2).stream())
+                .collect(Collectors.toList());
+
+        Collections.shuffle(mockReceipts);
+        return mockReceipts;
     }
 
     public Receipt saveReceipt(Receipt receipt) {
