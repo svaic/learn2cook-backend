@@ -27,6 +27,14 @@ public class RecipesService {
     private ReceiptRepository receiptRepository;
 
     public List<Receipt> recipes() {
+        List<Receipt> recipes = receiptRepository.findAll();
+        if (recipes.isEmpty()) {
+            return receiptRepository.saveAllAndFlush(mockRecipes());
+        }
+        return recipes;
+    }
+
+    public List<Receipt> mockRecipes() {
         Receipt receipt1 = new Receipt();
         receipt1.setName("Macaroni");
         receipt1.setCategory(FoodCategory.MAIN);
