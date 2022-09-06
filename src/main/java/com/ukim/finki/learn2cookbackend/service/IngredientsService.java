@@ -1,15 +1,16 @@
 package com.ukim.finki.learn2cookbackend.service;
 
-import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
 import com.ukim.finki.learn2cookbackend.model.Ingredient;
+import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
+import com.ukim.finki.learn2cookbackend.model.Step;
 import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientSizeType;
 import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientType;
-import com.ukim.finki.learn2cookbackend.model.Step;
 import com.ukim.finki.learn2cookbackend.repository.IngredientRepository;
 import com.ukim.finki.learn2cookbackend.repository.IngredientWithSizeRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -66,8 +67,19 @@ public class IngredientsService {
         return getMockIngredients().stream().filter(x -> x.getName().equals(name)).findFirst().orElse(null);
     }
 
-    public List<IngredientWithSize> saveIngredients(List<IngredientWithSize> ingredientWithSizes) {
+    public List<IngredientWithSize> getAll() {
+        return ingredientRepository.findAll()
+                .stream()
+                .map(x -> wrapIngredientWithSize(x, 0, IngredientSizeType.X))
+                .collect(Collectors.toList());
+    }
+
+    public List<IngredientWithSize> saveIngredientsWithSize(List<IngredientWithSize> ingredientWithSizes) {
         return ingredientWithSizeRepository.saveAllAndFlush(ingredientWithSizes);
+    }
+
+    public List<Ingredient> saveIngredients(List<Ingredient> ingredients) {
+        return ingredientRepository.saveAll(ingredients);
     }
 
     public Ingredient saveIngredient(Ingredient ingredient) {
@@ -100,5 +112,17 @@ public class IngredientsService {
     private IngredientWithSize addIngredient(IngredientWithSize a, IngredientWithSize b) {
         a.setCount(a.getCount() + b.getCount());
         return a;
+    }
+
+    public List<Ingredient> mockIngredients() {
+        String[] ingredientNames = new String[]{"Cheese", "Breed", "Pizza", "Cooking Oil", "Chicken", "Rice", "Potatoes", "Ketchup", "Mayonnaise", "Pasta"};
+        return Arrays.stream(ingredientNames).map(x->{
+            Ingredient ingredient = new Ingredient();
+            ingredient.setName(x);
+            ingredient.setType(IngredientType.FRIDGE);
+            ingredient.setPictureUrl("");
+
+            return ingredient;
+        }).collect(Collectors.toList());
     }
 }
