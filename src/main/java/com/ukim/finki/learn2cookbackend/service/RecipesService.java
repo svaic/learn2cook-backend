@@ -31,7 +31,7 @@ public class RecipesService {
         if (recipes.isEmpty()) {
             return receiptRepository.saveAllAndFlush(new ArrayList<>(mockRecipes()));
         }
-        return mockRecipes();
+        return recipes;
     }
 
     public List<Receipt> mockRecipes() {
