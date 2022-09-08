@@ -29,4 +29,13 @@ public class IngredientWithSize {
     int count;
     @Enumerated(EnumType.STRING)
     IngredientSizeType sizeType;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != this.getClass()) return false;
+
+        IngredientWithSize ingredientWithSize = (IngredientWithSize) obj;
+        return ingredientWithSize.getId().equals(this.getId()) &&
+                ingredientWithSize.getIngredient().equals(this.getIngredient());
+    }
 }

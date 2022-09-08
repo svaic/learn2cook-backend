@@ -4,7 +4,7 @@ import com.ukim.finki.learn2cookbackend.exception.UserNotFound;
 import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
 import com.ukim.finki.learn2cookbackend.model.User;
 import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientSizeType;
-import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientType;
+import com.ukim.finki.learn2cookbackend.request.ChangeUserIngredientRequest;
 import com.ukim.finki.learn2cookbackend.request.LoginRequest;
 import com.ukim.finki.learn2cookbackend.service.IngredientsService;
 import com.ukim.finki.learn2cookbackend.service.UserService;
@@ -41,16 +41,9 @@ public class UserController {
     }
 
     @PostMapping("{username}")
-    public User addIngredient(@PathVariable String username, @RequestBody IngredientWithSize ingredient) {
+    public User changeIngredientState(@PathVariable String username, @RequestBody ChangeUserIngredientRequest request) {
         User user = userService.findUser(username);
-
-        if (ingredient.getIngredient().getType() == IngredientType.FRIDGE) {
-            user.getFridgeItems().add(ingredient);
-        } else if (ingredient.getIngredient().getType() == IngredientType.KITCHEN) {
-            user.getKitchenItems().add(ingredient);
-        }
-
-        return user;
+        return userService.changeIngredients(user, request.getIngredient(), request.isAddIngredient());
     }
 
     @GetMapping("ingredients")

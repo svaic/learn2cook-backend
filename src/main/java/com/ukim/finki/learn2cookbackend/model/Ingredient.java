@@ -26,4 +26,12 @@ public class Ingredient {
     String pictureUrl;
     @Enumerated(EnumType.STRING)
     IngredientType type;
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj.getClass() != this.getClass()) return false;
+
+        Ingredient ingredient = (Ingredient) obj;
+        return ingredient.getId().equals(this.getId());
+    }
 }

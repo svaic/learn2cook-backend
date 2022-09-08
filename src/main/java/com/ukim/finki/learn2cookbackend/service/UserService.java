@@ -2,11 +2,13 @@ package com.ukim.finki.learn2cookbackend.service;
 
 import com.ukim.finki.learn2cookbackend.exception.UserNotFound;
 import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
-import com.ukim.finki.learn2cookbackend.model.Settings;
 import com.ukim.finki.learn2cookbackend.model.MealPeriod;
+import com.ukim.finki.learn2cookbackend.model.Settings;
 import com.ukim.finki.learn2cookbackend.model.User;
 import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientSizeType;
+import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientType;
 import com.ukim.finki.learn2cookbackend.model.enumerable.UserType;
+import com.ukim.finki.learn2cookbackend.model.interfaces.ListOperation;
 import com.ukim.finki.learn2cookbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -87,6 +89,21 @@ public class UserService {
         User user = getDefaultUserSettings();
         user.setUsername(username);
         user.setPassword(password);
+        return saveUser(user);
+    }
+
+    public User changeIngredients(User user, IngredientWithSize ingredientToChange, boolean isAddIngredient) {
+        ListOperation add = List::add;
+        ListOperation remove = List::remove;
+
+        ListOperation listOperation = isAddIngredient ? add : remove;
+
+        List<IngredientWithSize> filteredIngredients =
+                ingredientToChange.getIngredient().getType() == IngredientType.FRIDGE ?
+                        user.getFridgeItems() : user.getKitchenItems();
+
+        listOperation.apply(filteredIngredients, ingredientToChange);
+
         return saveUser(user);
     }
 

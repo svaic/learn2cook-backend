@@ -6,6 +6,7 @@ import com.ukim.finki.learn2cookbackend.service.IngredientsService;
 import com.ukim.finki.learn2cookbackend.service.RecipesService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,8 +25,7 @@ public class RecipesController {
     }
 
     @GetMapping("save")
-    public Receipt saveRecipes() {
-        Receipt newReceipt = recipesService.recipes().get(0);
-        return recipesService.saveReceipt(newReceipt);
+    public Receipt saveRecipes(@RequestBody Receipt receipt) {
+        return recipesService.saveReceipt(receipt);
     }
 }

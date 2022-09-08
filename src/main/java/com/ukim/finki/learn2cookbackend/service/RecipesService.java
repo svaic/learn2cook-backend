@@ -29,9 +29,9 @@ public class RecipesService {
     public List<Receipt> recipes() {
         List<Receipt> recipes = receiptRepository.findAll();
         if (recipes.isEmpty()) {
-            return receiptRepository.saveAllAndFlush(new ArrayList<>(mockRecipes()));
+            return receiptRepository.saveAllAndFlush(mockRecipes());
         }
-        return recipes;
+        return shuffleRecipes(recipes);
     }
 
     public List<Receipt> mockRecipes() {
@@ -85,7 +85,7 @@ public class RecipesService {
         step3.setPictureUrl("https://thumbs.dreamstime.com/z/turn-oven-dial-wit-hnd-hand-close-heat-meat-lunch-dinner-food-preparation-ingredient-cooking-chef-house-family-ready-gourmet-139076178.jpg");
         step3.setDuration(Duration.ZERO);
 
-        List<Step> stepsForReceipt1 = new ArrayList<>(List.of(step1, step2, step3));
+        List<Step> stepsForReceipt1 = new ArrayList<>(List.of(step1, step2, step3, lastStep(step3.getStepNumber() + 1)));
 
         receipt1.setSteps(stepsForReceipt1);
         receipt1.setIngredients(ingredientsService.sumOfIngredientsWithSize(stepsForReceipt1));
@@ -112,19 +112,34 @@ public class RecipesService {
         step3ForReceipt2.setPictureUrl("https://thumbs.dreamstime.com/z/turn-oven-dial-wit-hnd-hand-close-heat-meat-lunch-dinner-food-preparation-ingredient-cooking-chef-house-family-ready-gourmet-139076178.jpg");
         step3ForReceipt2.setDuration(Duration.ZERO);
 
-        List<Step> stepsForReceipt2 = new ArrayList<>(List.of(step1ForReceipt2, step2ForReceipt2, step3ForReceipt2));
+        List<Step> stepsForReceipt2 = new ArrayList<>(List.of(step1ForReceipt2, step2ForReceipt2, step3ForReceipt2, lastStep(step1ForReceipt2.getStepNumber() + 1)));
 
         receipt2.setSteps(stepsForReceipt2);
         receipt2.setIngredients(ingredientsService.sumOfIngredientsWithSize(stepsForReceipt2));
         receipt2.setTimeToPrepare(Duration.ofMinutes(30));
 
-        List<Receipt> mockReceipts = Stream.concat(
-                Collections.nCopies(5, receipt1).stream(),
-                Collections.nCopies(5, receipt2).stream())
+        return Stream.of(receipt1, receipt2).collect(Collectors.toList());
+    }
+
+    private Step lastStep(int stepNumber) {
+        Step lastStep = new Step();
+        lastStep.setStepNumber(stepNumber);
+        lastStep.setIngredientsUsed(new ArrayList<>());
+        lastStep.setDuration(Duration.ZERO);
+        lastStep.setPictureUrl("https://pbs.twimg.com/media/FKxX4qfX0AEGb-B.jpg");
+        lastStep.setDescription("Congratulations on finishing this receipt");
+
+        return lastStep;
+    }
+
+    private List<Receipt> shuffleRecipes(List<Receipt> recipes) {
+        recipes = recipes.stream()
+                .flatMap(receipt-> Collections.nCopies(5, receipt).stream())
                 .collect(Collectors.toList());
 
-        Collections.shuffle(mockReceipts);
-        return mockReceipts;
+        Collections.shuffle(recipes);
+
+        return recipes;
     }
 
     public Receipt saveReceipt(Receipt receipt) {
