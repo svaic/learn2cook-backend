@@ -29,7 +29,7 @@ public class RecipesService {
     public List<Receipt> recipes() {
         List<Receipt> recipes = receiptRepository.findAll();
         if (recipes.isEmpty()) {
-            return receiptRepository.saveAllAndFlush(mockRecipes());
+            recipes = receiptRepository.saveAllAndFlush(mockRecipes());
         }
         return shuffleRecipes(recipes);
     }
@@ -112,7 +112,7 @@ public class RecipesService {
         step3ForReceipt2.setPictureUrl("https://thumbs.dreamstime.com/z/turn-oven-dial-wit-hnd-hand-close-heat-meat-lunch-dinner-food-preparation-ingredient-cooking-chef-house-family-ready-gourmet-139076178.jpg");
         step3ForReceipt2.setDuration(Duration.ZERO);
 
-        List<Step> stepsForReceipt2 = new ArrayList<>(List.of(step1ForReceipt2, step2ForReceipt2, step3ForReceipt2, lastStep(step1ForReceipt2.getStepNumber() + 1)));
+        List<Step> stepsForReceipt2 = new ArrayList<>(List.of(step1ForReceipt2, step2ForReceipt2, step3ForReceipt2, lastStep(step3ForReceipt2.getStepNumber() + 1)));
 
         receipt2.setSteps(stepsForReceipt2);
         receipt2.setIngredients(ingredientsService.sumOfIngredientsWithSize(stepsForReceipt2));
