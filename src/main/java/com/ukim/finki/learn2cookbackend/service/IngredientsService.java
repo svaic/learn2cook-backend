@@ -68,10 +68,19 @@ public class IngredientsService {
     }
 
     public List<IngredientWithSize> getAll() {
-        return ingredientRepository.findAll()
-                .stream()
-                .map(x -> wrapIngredientWithSize(x, 0, IngredientSizeType.X))
-                .collect(Collectors.toList());
+        List<IngredientWithSize> fetch = ingredientWithSizeRepository.findAll();
+
+        if (fetch.isEmpty()) {
+            fetch = saveIngredientsWithSize(
+                    ingredientRepository
+                            .findAll()
+                            .stream()
+                            .map(x->wrapIngredientWithSize(x,1,IngredientSizeType.X))
+                            .collect(Collectors.toList())
+            );
+        }
+
+        return fetch;
     }
 
     public List<IngredientWithSize> saveIngredientsWithSize(List<IngredientWithSize> ingredientWithSizes) {
