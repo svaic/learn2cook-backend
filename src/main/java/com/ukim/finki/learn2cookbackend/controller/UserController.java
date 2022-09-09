@@ -40,7 +40,7 @@ public class UserController {
         return userService.registerUser(loginRequest.getUsername(), loginRequest.getPassword());
     }
 
-    @PostMapping("{username}")
+    @PostMapping("changeIngredients/{username}")
     public User changeIngredientState(@PathVariable String username, @RequestBody ChangeUserIngredientRequest request) {
         User user = userService.findUser(username);
         return userService.changeIngredients(user, request.getIngredient(), request.isAddIngredient());
