@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -22,7 +23,7 @@ public class Step {
     Long Id;
     int stepNumber;
     String pictureUrl;
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     List<IngredientWithSize> ingredientsUsed;
     String description;
     Duration duration;

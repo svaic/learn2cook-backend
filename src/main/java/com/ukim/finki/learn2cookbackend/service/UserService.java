@@ -5,7 +5,6 @@ import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
 import com.ukim.finki.learn2cookbackend.model.MealPeriod;
 import com.ukim.finki.learn2cookbackend.model.Settings;
 import com.ukim.finki.learn2cookbackend.model.User;
-import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientSizeType;
 import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientType;
 import com.ukim.finki.learn2cookbackend.model.enumerable.UserType;
 import com.ukim.finki.learn2cookbackend.model.interfaces.ListOperation;
@@ -17,14 +16,9 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-
-    @Autowired
-    private IngredientsService ingredientsService;
-
     @Autowired
     private UserRepository userRepository;
 
@@ -41,25 +35,20 @@ public class UserService {
     public User getDefaultUserSettings() {
         // default data
         User user = new User();
+        user.setUsername("test");
+        user.setPassword("test");
         user.setType(UserType.DEFAULT);
         user.setPoints(0);
-        user.setKitchenItems(ingredientsService.getMockKitchenItems());
-
-        List<IngredientWithSize> fridgeIngredients =
-                ingredientsService.getMockIngredients()
-                        .stream()
-                        .map(x->ingredientsService.wrapIngredientWithSize(x, 500, IngredientSizeType.KG))
-                        .collect(Collectors.toList());
-
-        user.setFridgeItems(fridgeIngredients);
+        user.setKitchenItems(new ArrayList<>());
+        user.setFridgeItems(new ArrayList<>());
 
         Settings settings = new Settings();
         settings.setFilterIngredients(new ArrayList<>());
         settings.setVegan(false);
         settings.setMaxCalories(null);
 
-        LocalTime breakfastFrom = LocalTime.of(9,0);
-        LocalTime breakfastTo = LocalTime.of(11,0);
+        LocalTime breakfastFrom = LocalTime.of(9, 0);
+        LocalTime breakfastTo = LocalTime.of(11, 0);
 
         MealPeriod breakFast = periodFactory(breakfastFrom, breakfastTo, false, true);
 

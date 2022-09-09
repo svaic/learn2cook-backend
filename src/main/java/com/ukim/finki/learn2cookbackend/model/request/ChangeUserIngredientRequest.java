@@ -1,4 +1,4 @@
-package com.ukim.finki.learn2cookbackend.request;
+package com.ukim.finki.learn2cookbackend.model.request;
 
 import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
 import lombok.Getter;

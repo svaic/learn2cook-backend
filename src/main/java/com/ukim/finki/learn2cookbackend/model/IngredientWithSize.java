@@ -6,7 +6,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -24,7 +23,7 @@ public class IngredientWithSize {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    @ManyToOne(cascade= CascadeType.ALL)
+    @ManyToOne
     Ingredient ingredient;
     int count;
     @Enumerated(EnumType.STRING)
@@ -35,7 +34,6 @@ public class IngredientWithSize {
         if (obj.getClass() != this.getClass()) return false;
 
         IngredientWithSize ingredientWithSize = (IngredientWithSize) obj;
-        return ingredientWithSize.getId().equals(this.getId()) &&
-                ingredientWithSize.getIngredient().equals(this.getIngredient());
+        return ingredientWithSize.getId().equals(this.getId());
     }
 }

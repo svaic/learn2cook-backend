@@ -1,11 +1,11 @@
 package com.ukim.finki.learn2cookbackend.controller;
 
 import com.ukim.finki.learn2cookbackend.exception.UserNotFound;
+import com.ukim.finki.learn2cookbackend.model.Ingredient;
 import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
 import com.ukim.finki.learn2cookbackend.model.User;
-import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientSizeType;
-import com.ukim.finki.learn2cookbackend.request.ChangeUserIngredientRequest;
-import com.ukim.finki.learn2cookbackend.request.LoginRequest;
+import com.ukim.finki.learn2cookbackend.model.request.ChangeUserIngredientRequest;
+import com.ukim.finki.learn2cookbackend.model.request.LoginRequest;
 import com.ukim.finki.learn2cookbackend.service.IngredientsService;
 import com.ukim.finki.learn2cookbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,9 +30,9 @@ public class UserController {
         User user = userService.findUser(loginRequest.getUsername());
         if (!user.getPassword().equals(loginRequest.getPassword())) {
             throw new UserNotFound();
-        } else {
-            return user;
         }
+
+        return user;
     }
 
     @PostMapping("register")
@@ -46,17 +46,13 @@ public class UserController {
         return userService.changeIngredients(user, request.getIngredient(), request.isAddIngredient());
     }
 
+    @GetMapping("ingredientsSize")
+    public List<IngredientWithSize> getAllIngredientsWithSize() {
+        return ingredientsService.getAllWithSize();
+    }
+
     @GetMapping("ingredients")
-    public List<IngredientWithSize> getAllIngredients() {
-        List<IngredientWithSize> ingredients = ingredientsService.getAll();
-
-        if(ingredients.isEmpty()) {
-            return ingredientsService.saveIngredients(ingredientsService.getMockIngredients())
-                    .stream()
-                    .map(x->ingredientsService.wrapIngredientWithSize(x,0, IngredientSizeType.X))
-                    .toList();
-        }
-
+    public List<Ingredient> getAllIngredients() {
         return ingredientsService.getAll();
     }
 }

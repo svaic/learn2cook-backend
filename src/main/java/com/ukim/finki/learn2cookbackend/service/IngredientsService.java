@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class IngredientsService {
@@ -26,78 +25,30 @@ public class IngredientsService {
     @Autowired
     private IngredientWithSizeRepository ingredientWithSizeRepository;
 
-    public List<Ingredient> getMockIngredients() {
-
-        Ingredient rawMacaroniIngredient = new Ingredient();
-        rawMacaroniIngredient.setName("Raw macaroni");
-        rawMacaroniIngredient.setPictureUrl("https://midnightdelivery.ch/wp-content/uploads/2022/05/MidnightDelivery_WallisellenZuerich_Kraft_Maccaroni_-Cheese.png");
-        rawMacaroniIngredient.setType(IngredientType.FRIDGE);
-
-        Ingredient saltIngredient = new Ingredient();
-        saltIngredient.setName("Salt");
-        saltIngredient.setPictureUrl("https://www.wissenschaft.de/wp-content/uploads/1/8/18-01-15-salz.jpg");
-        saltIngredient.setType(IngredientType.FRIDGE);
-
-        return List.of(rawMacaroniIngredient, saltIngredient);
-    }
-
-    public List<IngredientWithSize> getMockKitchenItems() {
-        Ingredient pot = new Ingredient();
-        pot.setName("pot");
-        pot.setPictureUrl("https://www.ikea.com/ch/en/images/products/annons-pot-with-lid-glass-stainless-steel__0714768_pe730240_s5.jpg");
-        pot.setType(IngredientType.KITCHEN);
-
-        Ingredient grater = new Ingredient();
-        grater.setName("grater");
-        grater.setPictureUrl("https://www.ikea.com/ch/en/images/products/idealisk-grater-stainless-steel__0713134_pe729282_s5.jpg?f=xs");
-        grater.setType(IngredientType.KITCHEN);
-
-        Ingredient stove = new Ingredient();
-        stove.setName("stove");
-        stove.setPictureUrl("https://m.media-amazon.com/images/S/aplus-media/vc/96d54909-1f79-43bf-8beb-136a6d56aaf9.__CR236,270,4713,2915_PT0_SX970_V1___.jpg");
-        stove.setType(IngredientType.KITCHEN);
-
-        IngredientWithSize potWithSize = wrapIngredientWithSize(pot, 1, IngredientSizeType.X);
-        IngredientWithSize graterWithSize = wrapIngredientWithSize(grater, 1, IngredientSizeType.X);
-        IngredientWithSize stoveWithSize = wrapIngredientWithSize(stove, 1, IngredientSizeType.X);
-        return Stream.of(potWithSize, graterWithSize, stoveWithSize).collect(Collectors.toList());
-    }
-
     public Ingredient getIngredient(String name) {
-        return getMockIngredients().stream().filter(x -> x.getName().equals(name)).findFirst().orElse(null);
+        return ingredientRepository.findByName(name)
+                .orElse(null);
     }
 
-    public List<IngredientWithSize> getAll() {
-        List<IngredientWithSize> fetch = ingredientWithSizeRepository.findAll();
-
-        if (fetch.isEmpty()) {
-            fetch = saveIngredientsWithSize(
-                    ingredientRepository
-                            .findAll()
-                            .stream()
-                            .map(x->wrapIngredientWithSize(x,1,IngredientSizeType.X))
-                            .collect(Collectors.toList())
-            );
-        }
-
-        return fetch;
+    public List<Ingredient> getKitchenItems() {
+        return ingredientRepository.findByType(IngredientType.KITCHEN);
     }
 
-    public List<IngredientWithSize> saveIngredientsWithSize(List<IngredientWithSize> ingredientWithSizes) {
-        return ingredientWithSizeRepository.saveAllAndFlush(ingredientWithSizes);
+    public List<IngredientWithSize> getAllWithSize() {
+        return ingredientWithSizeRepository.findAll();
     }
 
-    public List<Ingredient> saveIngredients(List<Ingredient> ingredients) {
+    public List<Ingredient> getAll() {
+        return ingredientRepository.findAll();
+    }
+
+    public List<Ingredient> saveAll(List<Ingredient> ingredients) {
         return ingredientRepository.saveAll(ingredients);
-    }
-
-    public Ingredient saveIngredient(Ingredient ingredient) {
-        return ingredientRepository.save(ingredient);
     }
 
     public List<IngredientWithSize> sumOfIngredientsWithSize(List<Step> steps) {
         Map<String, Optional<IngredientWithSize>> distinctIngredients = steps.stream()
-                .flatMap(x->x.getIngredientsUsed().stream())
+                .flatMap(x -> x.getIngredientsUsed().stream())
                 .collect(
                         Collectors.groupingBy((x->x.getIngredient().getName()),
                                 Collectors.reducing(this::addIngredient))
@@ -125,7 +76,7 @@ public class IngredientsService {
 
     public List<Ingredient> mockIngredients() {
         String[] ingredientNames = new String[]{"Cheese", "Breed", "Pizza", "Cooking Oil", "Chicken", "Rice", "Potatoes", "Ketchup", "Mayonnaise", "Pasta"};
-        return Arrays.stream(ingredientNames).map(x->{
+        List<Ingredient> ingredients = Arrays.stream(ingredientNames).map(x -> {
             Ingredient ingredient = new Ingredient();
             ingredient.setName(x);
             ingredient.setType(IngredientType.FRIDGE);
@@ -133,5 +84,39 @@ public class IngredientsService {
 
             return ingredient;
         }).collect(Collectors.toList());
+
+        Ingredient rawMacaroniIngredient = new Ingredient();
+        rawMacaroniIngredient.setName("Raw macaroni");
+        rawMacaroniIngredient.setPictureUrl("https://midnightdelivery.ch/wp-content/uploads/2022/05/MidnightDelivery_WallisellenZuerich_Kraft_Maccaroni_-Cheese.png");
+        rawMacaroniIngredient.setType(IngredientType.FRIDGE);
+
+        Ingredient saltIngredient = new Ingredient();
+        saltIngredient.setName("Salt");
+        saltIngredient.setPictureUrl("https://www.wissenschaft.de/wp-content/uploads/1/8/18-01-15-salz.jpg");
+        saltIngredient.setType(IngredientType.FRIDGE);
+
+        ingredients.add(rawMacaroniIngredient);
+        ingredients.add(saltIngredient);
+
+        Ingredient pot = new Ingredient();
+        pot.setName("pot");
+        pot.setPictureUrl("https://www.ikea.com/ch/en/images/products/annons-pot-with-lid-glass-stainless-steel__0714768_pe730240_s5.jpg");
+        pot.setType(IngredientType.KITCHEN);
+
+        Ingredient grater = new Ingredient();
+        grater.setName("grater");
+        grater.setPictureUrl("https://www.ikea.com/ch/en/images/products/idealisk-grater-stainless-steel__0713134_pe729282_s5.jpg?f=xs");
+        grater.setType(IngredientType.KITCHEN);
+
+        Ingredient stove = new Ingredient();
+        stove.setName("stove");
+        stove.setPictureUrl("https://m.media-amazon.com/images/S/aplus-media/vc/96d54909-1f79-43bf-8beb-136a6d56aaf9.__CR236,270,4713,2915_PT0_SX970_V1___.jpg");
+        stove.setType(IngredientType.KITCHEN);
+
+        ingredients.add(pot);
+        ingredients.add(grater);
+        ingredients.add(stove);
+
+        return ingredients;
     }
 }

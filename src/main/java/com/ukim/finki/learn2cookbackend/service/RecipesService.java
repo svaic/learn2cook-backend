@@ -1,12 +1,14 @@
 package com.ukim.finki.learn2cookbackend.service;
 
 import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
-import com.ukim.finki.learn2cookbackend.model.enumerable.FoodCategory;
-import com.ukim.finki.learn2cookbackend.model.enumerable.ReceiptDifficulty;
-import com.ukim.finki.learn2cookbackend.model.enumerable.ReceiptType;
 import com.ukim.finki.learn2cookbackend.model.Receipt;
 import com.ukim.finki.learn2cookbackend.model.Step;
+import com.ukim.finki.learn2cookbackend.model.User;
+import com.ukim.finki.learn2cookbackend.model.dto.ReceiptDto;
+import com.ukim.finki.learn2cookbackend.model.enumerable.FoodCategory;
 import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientSizeType;
+import com.ukim.finki.learn2cookbackend.model.enumerable.ReceiptDifficulty;
+import com.ukim.finki.learn2cookbackend.model.enumerable.ReceiptType;
 import com.ukim.finki.learn2cookbackend.repository.ReceiptRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,12 +28,20 @@ public class RecipesService {
     @Autowired
     private ReceiptRepository receiptRepository;
 
-    public List<Receipt> recipes() {
+    public List<ReceiptDto> recipes(User user) {
+
         List<Receipt> recipes = receiptRepository.findAll();
-        if (recipes.isEmpty()) {
-            recipes = receiptRepository.saveAllAndFlush(mockRecipes());
-        }
-        return shuffleRecipes(recipes);
+
+        List<IngredientWithSize> ingredientsOfUser = new ArrayList<>();
+        ingredientsOfUser.addAll(user.getFridgeItems());
+        ingredientsOfUser.addAll(user.getKitchenItems());
+
+        recipes = shuffleRecipes(recipes);
+
+        return recipes
+                .stream()
+                .map(x -> checkReceiptForUser(ingredientsOfUser, x))
+                .collect(Collectors.toList());
     }
 
     public List<Receipt> mockRecipes() {
@@ -61,8 +71,8 @@ public class RecipesService {
         saltWithSize.setCount(150);
         saltWithSize.setSizeType(IngredientSizeType.G);
 
-        receipt1.setKitchenEquipment(ingredientsService.getMockKitchenItems());
-        receipt2.setKitchenEquipment(ingredientsService.getMockKitchenItems());
+        receipt1.setKitchenEquipment(ingredientsService.getKitchenItems().stream().map(x -> ingredientsService.wrapIngredientWithSize(x, 100, IngredientSizeType.X)).collect(Collectors.toList()));
+        receipt2.setKitchenEquipment(ingredientsService.getKitchenItems().stream().map(x -> ingredientsService.wrapIngredientWithSize(x, 100, IngredientSizeType.X)).collect(Collectors.toList()));
 
         Step step1 = new Step();
         step1.setStepNumber(1);
@@ -91,9 +101,19 @@ public class RecipesService {
         receipt1.setIngredients(ingredientsService.sumOfIngredientsWithSize(stepsForReceipt1));
         receipt1.setTimeToPrepare(Duration.ofMinutes(30));
 
+        IngredientWithSize ingredientWithSize1 = new IngredientWithSize();
+        ingredientWithSize1.setIngredient(ingredientsService.getIngredient("Ketchup"));
+        ingredientWithSize1.setSizeType(IngredientSizeType.X);
+        ingredientWithSize1.setCount(100);
+
+        IngredientWithSize ingredientWithSize2 = new IngredientWithSize();
+        ingredientWithSize2.setIngredient(ingredientsService.getIngredient("Pizza"));
+        ingredientWithSize2.setSizeType(IngredientSizeType.X);
+        ingredientWithSize2.setCount(200);
+
         Step step1ForReceipt2 = new Step();
         step1ForReceipt2.setStepNumber(1);
-        step1ForReceipt2.setIngredientsUsed(new ArrayList<>(List.of(macaroniWithSize)));
+        step1ForReceipt2.setIngredientsUsed(new ArrayList<>(List.of(ingredientWithSize1)));
         step1ForReceipt2.setDescription("Stavi voda vo ringla");
         step1ForReceipt2.setPictureUrl("https://www.thoughtco.com/thmb/r213S4ELSf1XozTXmITBspeLz6Y=/1333x1000/smart/filters:no_upscale()/BoilingWater-58e3d1ac5f9b58ef7e060f93.jpg");
         step1ForReceipt2.setDuration(Duration.ofMinutes(15));
@@ -134,7 +154,7 @@ public class RecipesService {
 
     private List<Receipt> shuffleRecipes(List<Receipt> recipes) {
         recipes = recipes.stream()
-                .flatMap(receipt-> Collections.nCopies(5, receipt).stream())
+                .flatMap(receipt -> Collections.nCopies(5, receipt).stream())
                 .collect(Collectors.toList());
 
         Collections.shuffle(recipes);
@@ -142,7 +162,34 @@ public class RecipesService {
         return recipes;
     }
 
+    private ReceiptDto checkReceiptForUser(List<IngredientWithSize> ingredientsOfUser, Receipt receipt) {
+
+        ReceiptDto receiptDto = new ReceiptDto();
+        receiptDto.setReceipt(receipt);
+        receiptDto.setCanMake(false);
+
+        List<IngredientWithSize> receiptIngredients = receipt.getIngredients();
+
+        for (IngredientWithSize ingredientWithSize : receiptIngredients) {
+            boolean contains = ingredientsOfUser
+                    .stream()
+                    .anyMatch(x -> x.getIngredient()
+                            .equals(ingredientWithSize.getIngredient())
+                    );
+
+            if (!contains) return receiptDto;
+        }
+
+        receiptDto.setCanMake(true);
+
+        return receiptDto;
+    }
+
     public Receipt saveReceipt(Receipt receipt) {
-        return receiptRepository.saveAndFlush(receipt);
+        return receiptRepository.save(receipt);
+    }
+
+    public List<Receipt> saveAll(List<Receipt> recipes) {
+        return receiptRepository.saveAll(recipes);
     }
 }
