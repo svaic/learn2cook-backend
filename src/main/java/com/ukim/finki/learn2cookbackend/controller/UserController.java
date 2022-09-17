@@ -9,11 +9,8 @@ import com.ukim.finki.learn2cookbackend.model.request.LoginRequest;
 import com.ukim.finki.learn2cookbackend.service.IngredientsService;
 import com.ukim.finki.learn2cookbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -54,5 +51,11 @@ public class UserController {
     @GetMapping("ingredients")
     public List<Ingredient> getAllIngredients() {
         return ingredientsService.getAll();
+    }
+
+
+    @PostMapping("image/receipt")
+    public User receiveImage(@RequestParam("receiptId") Long receiptId, @RequestParam("username") String username, @RequestParam("image") MultipartFile image) {
+        return userService.addReceiptDone(username, receiptId, image);
     }
 }

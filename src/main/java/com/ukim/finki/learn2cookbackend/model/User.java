@@ -4,13 +4,8 @@ import com.ukim.finki.learn2cookbackend.model.enumerable.UserType;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.OneToOne;
+import javax.persistence.*;
 import java.util.List;
 
 @Getter
@@ -26,6 +21,8 @@ public class User {
     List<IngredientWithSize> fridgeItems;
     @ManyToMany(cascade = CascadeType.ALL)
     List<IngredientWithSize> kitchenItems;
+    @ManyToMany(cascade = CascadeType.ALL)
+    List<ReceiptDone> receiptsDone;
     int points;
     @OneToOne(cascade = CascadeType.ALL)
     Settings settings;

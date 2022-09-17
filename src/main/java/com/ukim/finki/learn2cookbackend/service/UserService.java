@@ -1,16 +1,14 @@
 package com.ukim.finki.learn2cookbackend.service;
 
 import com.ukim.finki.learn2cookbackend.exception.UserNotFound;
-import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
-import com.ukim.finki.learn2cookbackend.model.MealPeriod;
-import com.ukim.finki.learn2cookbackend.model.Settings;
-import com.ukim.finki.learn2cookbackend.model.User;
+import com.ukim.finki.learn2cookbackend.model.*;
 import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientType;
 import com.ukim.finki.learn2cookbackend.model.enumerable.UserType;
 import com.ukim.finki.learn2cookbackend.model.interfaces.ListOperation;
 import com.ukim.finki.learn2cookbackend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -21,6 +19,9 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CertificateService certificateService;
 
     public User findUser(String username) {
         Optional<User> user = userRepository.findById(username);
@@ -41,6 +42,7 @@ public class UserService {
         user.setPoints(0);
         user.setKitchenItems(new ArrayList<>());
         user.setFridgeItems(new ArrayList<>());
+        user.setReceiptsDone(new ArrayList<>());
 
         Settings settings = new Settings();
         settings.setFilterIngredients(new ArrayList<>());
@@ -94,6 +96,24 @@ public class UserService {
         listOperation.apply(filteredIngredients, ingredientToChange);
 
         return saveUser(user);
+    }
+
+    public User addReceiptDone(String username, Long receiptId, MultipartFile image) {
+        User user = findUser(username);
+
+        ReceiptDone receiptDone = certificateService.createReceiptDone(receiptId, image);
+        user.getReceiptsDone().add(receiptDone);
+
+        user.setPoints(calculatePoints(user));
+
+        return saveUser(user);
+    }
+
+    private Integer calculatePoints(User user) {
+        return user.getReceiptsDone()
+                .stream()
+                .mapToInt(x->x.getReceipt().getPoints())
+                .sum();
     }
 
     private MealPeriod periodFactory(LocalTime from, LocalTime to, boolean salad, boolean desert) {

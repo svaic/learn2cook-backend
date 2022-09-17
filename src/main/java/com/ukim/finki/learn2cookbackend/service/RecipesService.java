@@ -1,5 +1,6 @@
 package com.ukim.finki.learn2cookbackend.service;
 
+import com.ukim.finki.learn2cookbackend.exception.ReceiptNotFound;
 import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
 import com.ukim.finki.learn2cookbackend.model.Receipt;
 import com.ukim.finki.learn2cookbackend.model.Step;
@@ -28,7 +29,7 @@ public class RecipesService {
     @Autowired
     private ReceiptRepository receiptRepository;
 
-    public List<ReceiptDto> recipes(User user) {
+    public List<ReceiptDto> getRecipesForUser(User user) {
 
         List<Receipt> recipes = receiptRepository.findAll();
 
@@ -40,8 +41,20 @@ public class RecipesService {
 
         return recipes
                 .stream()
-                .map(x -> checkReceiptForUser(ingredientsOfUser, x))
+                .map(x -> calcReceiptForUser(ingredientsOfUser, x))
                 .collect(Collectors.toList());
+    }
+
+    public Receipt getReceipt(Long receiptId) {
+        return receiptRepository.findById(receiptId).orElseThrow(ReceiptNotFound::new);
+    }
+
+    public Receipt saveReceipt(Receipt receipt) {
+        return receiptRepository.save(receipt);
+    }
+
+    public List<Receipt> saveAll(List<Receipt> recipes) {
+        return receiptRepository.saveAll(recipes);
     }
 
     public List<Receipt> mockRecipes() {
@@ -52,6 +65,7 @@ public class RecipesService {
         receipt1.setCalories(2000);
         receipt1.setDifficulty(ReceiptDifficulty.EASY);
         receipt1.setPictureUrl("https://www.ruchiskitchen.com/wp-content/uploads/2022/03/Indian-style-Vegetable-Macaroni-3-500x500.jpg");
+        receipt1.setPoints(50);
 
         Receipt receipt2 = new Receipt();
         receipt2.setName("Pizza");
@@ -60,6 +74,7 @@ public class RecipesService {
         receipt2.setCalories(2400);
         receipt2.setDifficulty(ReceiptDifficulty.HARD);
         receipt2.setPictureUrl("https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Eq_it-na_pizza-margherita_sep2005_sml.jpg/800px-Eq_it-na_pizza-margherita_sep2005_sml.jpg");
+        receipt2.setPoints(80);
 
         IngredientWithSize macaroniWithSize = new IngredientWithSize();
         macaroniWithSize.setIngredient(ingredientsService.getIngredient("Raw macaroni"));
@@ -162,7 +177,7 @@ public class RecipesService {
         return recipes;
     }
 
-    private ReceiptDto checkReceiptForUser(List<IngredientWithSize> ingredientsOfUser, Receipt receipt) {
+    private ReceiptDto calcReceiptForUser(List<IngredientWithSize> ingredientsOfUser, Receipt receipt) {
 
         ReceiptDto receiptDto = new ReceiptDto();
         receiptDto.setReceipt(receipt);
@@ -183,13 +198,5 @@ public class RecipesService {
         receiptDto.setCanMake(true);
 
         return receiptDto;
-    }
-
-    public Receipt saveReceipt(Receipt receipt) {
-        return receiptRepository.save(receipt);
-    }
-
-    public List<Receipt> saveAll(List<Receipt> recipes) {
-        return receiptRepository.saveAll(recipes);
     }
 }

@@ -7,11 +7,7 @@ import com.ukim.finki.learn2cookbackend.model.request.LoginRequest;
 import com.ukim.finki.learn2cookbackend.service.RecipesService;
 import com.ukim.finki.learn2cookbackend.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -29,7 +25,7 @@ public class RecipesController {
     public List<ReceiptDto> getAllRecipes(@RequestBody LoginRequest loginRequest) {
         User user = userService.findUser(loginRequest.getUsername());
 
-        return recipesService.recipes(user);
+        return recipesService.getRecipesForUser(user);
     }
 
     @GetMapping("save")
