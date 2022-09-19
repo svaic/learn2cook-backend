@@ -1,6 +1,13 @@
 package com.ukim.finki.learn2cookbackend.model.enumerable;
 
-public enum UserType {
+import org.springframework.security.core.GrantedAuthority;
+
+public enum UserType implements GrantedAuthority {
     DEFAULT,
-    ADMIN
+    ADMIN;
+
+    @Override
+    public String getAuthority() {
+        return "ROLE_" + name();
+    }
 }

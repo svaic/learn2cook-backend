@@ -1,6 +1,6 @@
 package com.ukim.finki.learn2cookbackend.service;
 
-import com.ukim.finki.learn2cookbackend.exception.ReceiptNotFound;
+import com.ukim.finki.learn2cookbackend.exception.ReceiptNotFoundException;
 import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
 import com.ukim.finki.learn2cookbackend.model.Receipt;
 import com.ukim.finki.learn2cookbackend.model.Step;
@@ -46,7 +46,7 @@ public class RecipesService {
     }
 
     public Receipt getReceipt(Long receiptId) {
-        return receiptRepository.findById(receiptId).orElseThrow(ReceiptNotFound::new);
+        return receiptRepository.findById(receiptId).orElseThrow(ReceiptNotFoundException::new);
     }
 
     public Receipt saveReceipt(Receipt receipt) {
