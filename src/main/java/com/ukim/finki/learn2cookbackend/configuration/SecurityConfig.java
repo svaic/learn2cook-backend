@@ -66,7 +66,7 @@ public class SecurityConfig {
         http.authorizeRequests()
                 .antMatchers("/")
                 .permitAll()
-                .antMatchers("/login")
+                .antMatchers("/login", "/register", "/refreshtoken")
                 .permitAll()
                 // Our private endpoints
                 .anyRequest()
@@ -91,6 +91,7 @@ public class SecurityConfig {
         config.setAllowCredentials(true);
         config.addAllowedOriginPattern("*");
         config.addAllowedHeader("*");
+        config.addExposedHeader("Authorization");
         config.addAllowedMethod("*");
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);

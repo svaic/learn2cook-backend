@@ -23,14 +23,20 @@ public class User implements UserDetails {
 
     @JsonIgnore
     String password;
+
     UserType type;
-    @ManyToMany(cascade = CascadeType.ALL)
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
     List<IngredientWithSize> fridgeItems;
-    @ManyToMany(cascade = CascadeType.ALL)
+
+    @ManyToMany(cascade = CascadeType.PERSIST)
     List<IngredientWithSize> kitchenItems;
+
     @ManyToMany(cascade = CascadeType.ALL)
     List<ReceiptDone> receiptsDone;
+
     int points;
+
     @OneToOne(cascade = CascadeType.ALL)
     Settings settings;
 

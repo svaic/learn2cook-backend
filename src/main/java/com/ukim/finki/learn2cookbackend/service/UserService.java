@@ -113,7 +113,18 @@ public class UserService implements UserDetailsService {
         User user = findUser(username);
 
         ReceiptDone receiptDone = certificateService.createReceiptDone(receiptId, image);
-        user.getReceiptsDone().add(receiptDone);
+
+        Optional<ReceiptDone> receiptAlreadyInList =
+                user.getReceiptsDone()
+                .stream()
+                .filter(x->x.getReceipt().getId().equals(receiptId))
+                .findAny();
+
+        if (receiptAlreadyInList.isPresent()) {
+            receiptAlreadyInList.get().setImageUrl(receiptDone.getImageUrl());
+        } else {
+            user.getReceiptsDone().add(receiptDone);
+        }
 
         user.setPoints(calculatePoints(user));
 
