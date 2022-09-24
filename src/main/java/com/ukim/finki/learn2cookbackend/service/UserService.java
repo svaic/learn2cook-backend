@@ -51,6 +51,7 @@ public class UserService implements UserDetailsService {
         user.setPassword(passwordEncoder.encode("test"));
         user.setType(UserType.DEFAULT);
         user.setPoints(0);
+        user.setHasArchivedCertificate(false);
         user.setKitchenItems(new ArrayList<>());
         user.setFridgeItems(new ArrayList<>());
         user.setReceiptsDone(new ArrayList<>());
@@ -126,7 +127,12 @@ public class UserService implements UserDetailsService {
             user.getReceiptsDone().add(receiptDone);
         }
 
-        user.setPoints(calculatePoints(user));
+        int pointsOfUser = calculatePoints(user);
+        user.setPoints(pointsOfUser);
+
+        if (pointsOfUser >= 500) {
+            user.setHasArchivedCertificate(true);
+        }
 
         return saveUser(user);
     }
