@@ -3,6 +3,7 @@ package com.ukim.finki.learn2cookbackend.controller;
 import com.ukim.finki.learn2cookbackend.configuration.jwt.JwtTokenUtil;
 import com.ukim.finki.learn2cookbackend.model.Ingredient;
 import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
+import com.ukim.finki.learn2cookbackend.model.Settings;
 import com.ukim.finki.learn2cookbackend.model.User;
 import com.ukim.finki.learn2cookbackend.model.request.ChangeUserIngredientRequest;
 import com.ukim.finki.learn2cookbackend.model.request.LoginRequest;
@@ -63,7 +64,7 @@ public class UserController {
     }
 
     @GetMapping("/refreshtoken")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request) throws Exception {
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
         // From the HttpRequest get the claims
         DefaultClaims claims = (io.jsonwebtoken.impl.DefaultClaims) request.getAttribute("claims");
 
@@ -101,5 +102,13 @@ public class UserController {
     @PostMapping("image/receipt")
     public User receiveImage(Authentication authentication, @RequestParam("receiptId") Long receiptId, @RequestParam("image") MultipartFile image) {
         return userService.addReceiptDone(authentication.getName(), receiptId, image);
+    }
+
+    @PostMapping("settings")
+    public ResponseEntity<?> updateSettings(Authentication authentication, @RequestBody Settings settings) {
+        User user = userService.findUser(authentication.getName());
+        user.setSettings(settings);
+        userService.saveUser(user);
+        return ResponseEntity.ok().build();
     }
 }

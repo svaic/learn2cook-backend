@@ -2,7 +2,6 @@ package com.ukim.finki.learn2cookbackend.service;
 
 import com.ukim.finki.learn2cookbackend.exception.UserNotFoundException;
 import com.ukim.finki.learn2cookbackend.model.*;
-import com.ukim.finki.learn2cookbackend.model.enumerable.IngredientType;
 import com.ukim.finki.learn2cookbackend.model.enumerable.UserType;
 import com.ukim.finki.learn2cookbackend.model.interfaces.ListOperation;
 import com.ukim.finki.learn2cookbackend.repository.UserRepository;
@@ -52,8 +51,7 @@ public class UserService implements UserDetailsService {
         user.setType(UserType.DEFAULT);
         user.setPoints(0);
         user.setHasArchivedCertificate(false);
-        user.setKitchenItems(new ArrayList<>());
-        user.setFridgeItems(new ArrayList<>());
+        user.setItems(new ArrayList<>());
         user.setReceiptsDone(new ArrayList<>());
 
         Settings settings = new Settings();
@@ -95,17 +93,13 @@ public class UserService implements UserDetailsService {
         return saveUser(user);
     }
 
-    public User changeIngredients(User user, IngredientWithSize ingredientToChange, boolean isAddIngredient) {
+    public User changeIngredients(User user, Ingredient ingredientToChange, boolean isAddIngredient) {
         ListOperation add = List::add;
         ListOperation remove = List::remove;
 
         ListOperation listOperation = isAddIngredient ? add : remove;
 
-        List<IngredientWithSize> filteredIngredients =
-                ingredientToChange.getIngredient().getType() == IngredientType.FRIDGE ?
-                        user.getFridgeItems() : user.getKitchenItems();
-
-        listOperation.apply(filteredIngredients, ingredientToChange);
+        listOperation.apply(user.getItems(), ingredientToChange);
 
         return saveUser(user);
     }
@@ -130,7 +124,7 @@ public class UserService implements UserDetailsService {
         int pointsOfUser = calculatePoints(user);
         user.setPoints(pointsOfUser);
 
-        if (pointsOfUser >= 500) {
+        if (pointsOfUser >= 100) {
             user.setHasArchivedCertificate(true);
         }
 

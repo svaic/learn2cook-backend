@@ -1,10 +1,10 @@
 package com.ukim.finki.learn2cookbackend.model.request;
 
-import com.ukim.finki.learn2cookbackend.model.IngredientWithSize;
+import com.ukim.finki.learn2cookbackend.model.Ingredient;
 import lombok.Getter;
 
 @Getter
 public class ChangeUserIngredientRequest {
-    IngredientWithSize ingredient;
+    Ingredient ingredient;
     boolean addIngredient;
 }

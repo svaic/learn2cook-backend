@@ -27,10 +27,7 @@ public class User implements UserDetails {
     UserType type;
 
     @ManyToMany(cascade = CascadeType.PERSIST)
-    List<IngredientWithSize> fridgeItems;
-
-    @ManyToMany(cascade = CascadeType.PERSIST)
-    List<IngredientWithSize> kitchenItems;
+    List<Ingredient> items;
 
     @ManyToMany(cascade = CascadeType.ALL)
     List<ReceiptDone> receiptsDone;
